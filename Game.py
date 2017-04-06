@@ -31,6 +31,8 @@ class Game(object):
         # init obstacle(s)
         self.obstacles = []
         self.obstacles.append(Rectangle(500, 700, 25, 300, 0))
+        self.obstacles.append(Rectangle(200, 550, 25, 200, 0))
+        self.obstacles.append(Rectangle(800, 550, 25, 200, 0))
 
         # init rockets
         self.n_rockets = n_rockets
