@@ -66,6 +66,9 @@ if __name__ == "__main__":
         # draw the rocket
         rocket1.draw()
 
+        st_fit = font.render("Fitness is %d" % (rocket1.fitness), 1, (255, 255, 255))
+        screen.blit(st_fit, scoretext.get_rect(center=(500,800)))
+
         # update the display
         pygame.display.update()
 

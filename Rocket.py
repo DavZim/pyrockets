@@ -15,6 +15,7 @@ class Rocket(object):
         self.crashed = False
         self.alive = True
         self.arrived = False
+        self.fitness = 0
         self.target_pos = np.array(target_pos).astype(float)
         self.target_radius = 40
         self.obstacle = obstacles
@@ -32,6 +33,7 @@ class Rocket(object):
         self.crashed = False
         self.current = 0
         self.mv_vector = np.array([0, 0])
+        self.fitness = 0
         self.rect.move_to(self.x_init, self.y_init)
         self.rect.rotate_to(180)
         self.color = (0, 0, 255)
@@ -49,9 +51,10 @@ class Rocket(object):
     # moves the rocket if its alive, calculates the movements based on DNA, reduces fuel etc.
     def move(self):
         if (self.alive):
+            self.fitness = self.calcFitness()
             # each turn, the rocket turns by 'turn' and accelerates by 'accel'
             turn = 0
-            accel = 10
+            accel = 1
             # turn the rocket
             self.rect.rotate_by(turn)
             self.rect.move_by(self.mv_vector[0], self.mv_vector[1])
@@ -91,3 +94,17 @@ class Rocket(object):
         # self.fitness /= 10
         # self.fuel = 0
         self.color = (255, 0, 0)
+
+    # calculates the current fitness of the rocket
+    def calcFitness(self):
+        rocket_pos = np.array((self.rect.x, self.rect.y)).astype(float)
+        d = self.dist(rocket_pos, self.target_pos)
+
+        fit = 1/(d+0.00001) * 100000
+        #(1. / (d + 0.00001)) * 1000 + self.fuel / self.max_fuel * 100
+        if d < self.target_radius:
+            self.alive = False
+            self.arrived = True
+            self.rect.move_to(self.target_pos[0], self.target_pos[1])
+            fit *= 5
+        return fit
