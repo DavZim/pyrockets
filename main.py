@@ -1,3 +1,4 @@
+import sys
 import pygame
 import pygame.time
 from pygame.locals import *
