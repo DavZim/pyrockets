@@ -5,6 +5,7 @@ import random, sys
 
 from Rectangle import Rectangle
 from Rocket import Rocket
+from DNA import DNA
 
 
 class Game(object):
@@ -38,7 +39,7 @@ class Game(object):
         self.rockets = []
         for i in range(n_rockets):
             self.rockets.append(
-                Rocket(self.screen, self.gameSize, [], lifespan, self.targetPos, self.obstacles))
+                Rocket(self.screen, self.gameSize, DNA(lifespan), lifespan, self.targetPos, self.obstacles))
 
         self.maxFit = 0
 
@@ -68,10 +69,22 @@ class Game(object):
         self.generation += 1
         self.maxFit = 0
         res = []
+        matingpool = self.populateMatingpool()
         self.success = 0
         for rocket in self.rockets:
-            rocket.reset()
-        return self.rockets
+            if rocket.fitness > self.maxFit:
+                self.maxFit = rocket.fitness
+
+            if rocket.arrived:
+                self.success += 1
+                self.total_success += 1
+            r = int(random.uniform(0, len(matingpool) - 1))
+            partner = matingpool[r]
+            newDNA = rocket.DNA.crossover(partner)
+            child = Rocket(self.screen, (1000, 1000), newDNA, self.lifespan, self.targetPos, self.obstacles)
+            child.DNA.mutate()
+            res.append(child)
+        return res
 
     # run the game
     def run(self):
@@ -98,3 +111,13 @@ class Game(object):
                     sys.exit()
 
             self.FPSCLOCK.tick(50)
+
+    # populates the matingpool based on the fitness of rockets
+    def populateMatingpool(self):
+        matingpool = []
+        for rocket in self.rockets:
+            n = int(rocket.fitness)
+            for i in range(n):
+                matingpool.append(rocket)
+        return matingpool
+

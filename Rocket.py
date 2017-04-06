@@ -1,6 +1,7 @@
 import numpy as np
 import pygame
 from Rectangle import Rectangle
+from DNA import DNA
 
 class Rocket(object):
 
@@ -24,7 +25,8 @@ class Rocket(object):
         self.x_init = int(game_size[0] / 2)
         self.y_init = int(game_size[1] - rocket_lengths / 2 - 1)
         self.rect = Rectangle(self.x_init, self.y_init, rocket_lengths, rocket_widths, 180)
-        
+        self.DNA = DNA
+
     # resets the rocket
     # not needed if Game is used
     def reset(self):
@@ -53,8 +55,11 @@ class Rocket(object):
         if (self.alive):
             self.fitness = self.calcFitness()
             # each turn, the rocket turns by 'turn' and accelerates by 'accel'
-            turn = 0
-            accel = 1
+            # nasty bug-fix...
+            if self.current >= len(self.DNA.genes_accel):
+                self.current = 0  # ?!
+            turn = self.DNA.genes_turn[self.current]
+            accel = self.DNA.genes_accel[self.current]
             # turn the rocket
             self.rect.rotate_by(turn)
             self.rect.move_by(self.mv_vector[0], self.mv_vector[1])
