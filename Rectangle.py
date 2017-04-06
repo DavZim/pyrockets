@@ -72,3 +72,38 @@ class Rectangle(object):
         # shift back to original area
         pts_rotated = pts_0_rotated + middle
         return pts_rotated
+
+    # returns true if the current rectangle intersects with a second, given rectangle
+    def intersect(self, other):
+        # first check if the rectangles are close to each other, to approximate the process
+        self_center = np.array([self.x, self.y])
+        other_center = np.array([other.x, other.y])
+        guess_dist = np.sqrt(sum((self_center - other_center)**2))
+        if (guess_dist > 1.5*(self.l + other.l + self.w + other.w)):
+            return False
+        else:
+            # using the two-axis theorem, calculate the axis
+            def intersectAxis(ptsA, ptsB):
+                ptsAx = ptsA[:,0]
+                ptsBx = ptsB[:,0]
+                ptsAy = ptsA[:,1]
+                ptsBy = ptsB[:,1]
+
+                isectx = min(ptsAx) < max(ptsBx) and max(ptsAx) > min(ptsBx)
+                isecty = min(ptsAy) < max(ptsBy) and max(ptsAy) > min(ptsBy)
+                return isectx and isecty
+
+            # first rotate around p1 from self
+            a = self.rotate_internal(self.pts, self.theta, self.pts[0][0], self.pts[0][1])
+            b = self.rotate_internal(other.pts, self.theta, self.pts[0][0], self.pts[0][1])
+
+            axis1 = intersectAxis(a, b)
+
+            # then rotate around p1 from other
+            a = self.rotate_internal(self.pts, other.theta, other.pts[0][0], other.pts[0][1])
+            b = self.rotate_internal(other.pts, other.theta, other.pts[0][0], other.pts[0][1])
+
+            axis2 = intersectAxis(a, b)
+
+            return axis1 and axis2
+
